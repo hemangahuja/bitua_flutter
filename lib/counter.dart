@@ -9,8 +9,8 @@ class Counter extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-       ElevatedButton(onPressed: ()=>updater(true), child: Text('add')),
-       ElevatedButton(onPressed: ()=>updater(false), child: Text('sub'))
+       ElevatedButton(onPressed: ()=>updater(true), child: const  Text('add')),
+       ElevatedButton(onPressed: ()=>updater(false), child: const Text('sub'))
       ],
     );
   }

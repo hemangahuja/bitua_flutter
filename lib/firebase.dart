@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'app.dart';
+import 'routes.dart';
 
 // Import the firebase_core plugin
 import 'package:firebase_core/firebase_core.dart';
@@ -12,6 +12,8 @@ import 'package:firebase_core/firebase_core.dart';
 /// would re-initialize FlutterFire and make our application re-enter loading state,
 /// which is undesired.
 class App extends StatefulWidget {
+  const App({Key? key}) : super(key: key);
+
   // Create the initialization Future outside of `build`:
   @override
   _AppState createState() => _AppState();
@@ -30,18 +32,18 @@ class _AppState extends State<App> {
       builder: (context, snapshot) {
         // Check for errors
         if (snapshot.hasError) {
-          print('wrong');
-          return Text('wrong');
+
+          return const Text('Error');
           
         }
 
         // Once complete, show your application
         if (snapshot.connectionState == ConnectionState.done) {
-          return MyApp();
+          return const RouteHandler();
         }
 
         // Otherwise, show something whilst waiting for initialization to complete
-        return CircularProgressIndicator();
+        return const CircularProgressIndicator();
       },
     );
   }

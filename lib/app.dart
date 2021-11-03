@@ -3,7 +3,7 @@ import 'package:http/http.dart' as http;
 import 'converter.dart';
 import 'dart:convert';
 import 'store.dart';
-
+import 'package:firebase_auth/firebase_auth.dart';
 
 class MyApp extends StatefulWidget {
   const MyApp({Key? key}) : super(key: key);
@@ -14,6 +14,11 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
 
+  final _auth = FirebaseAuth.instance;
+  late User? user;
+  
+ 
+
   List coins = ["bitcoin" , "ethereum"];
   String query = '';
   
@@ -22,6 +27,11 @@ class _MyAppState extends State<MyApp> {
     super.initState();
     for(int i = 0; i < coins.length;i++){
       query += "${coins[i]},";
+    }
+
+    user = _auth.currentUser;
+    if(user != null){
+      
     }
   }
   
@@ -39,6 +49,12 @@ class _MyAppState extends State<MyApp> {
       home: Scaffold(
         appBar: AppBar(
           title: const Text('Bitua'),
+          actions: [
+            IconButton(onPressed: (){
+              _auth.signOut();
+              Navigator.popAndPushNamed(context, '/'); 
+            }, icon: const Icon(Icons.logout))
+          ],
         ),
         body: Center(
           child: FutureBuilder(
@@ -48,7 +64,7 @@ class _MyAppState extends State<MyApp> {
                   return Column(
                     children: [
                       Converter(prices: jsonDecode(snapshot.data)),
-                      Store(coins : jsonDecode(snapshot.data).keys.toList())
+                      Store(coins : jsonDecode(snapshot.data).keys.toList()),
                     ],
                   );
                 } else {
