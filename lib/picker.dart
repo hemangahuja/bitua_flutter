@@ -28,7 +28,7 @@ class _PickerState extends State<Picker> {
   
   void showPicker(BuildContext context) {
     showCupertinoModalPopup(context: context,
-     builder: (_) => Container(
+     builder: (_) => SizedBox(
        width: 100,
        height: 200,
        child: CupertinoPicker(
