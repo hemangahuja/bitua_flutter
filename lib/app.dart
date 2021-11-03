@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'converter.dart';
+import 'screens/converter.dart';
 import 'dart:convert';
-import 'store.dart';
+import 'screens/store.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 class MyApp extends StatefulWidget {
-  const MyApp({Key? key}) : super(key: key);
+
+  final List coins;
+  const MyApp({Key? key , required this.coins}) : super(key: key);
 
   @override
   State<MyApp> createState() => _MyAppState();
@@ -19,20 +21,17 @@ class _MyAppState extends State<MyApp> {
   
  
 
-  List coins = ["bitcoin" , "ethereum"];
+  
   String query = '';
   
   @override
   void initState(){
     super.initState();
-    for(int i = 0; i < coins.length;i++){
-      query += "${coins[i]},";
+    for(int i = 0; i < widget.coins.length;i++){
+      query += "${widget.coins[i]},";
     }
 
-    user = _auth.currentUser;
-    if(user != null){
-      
-    }
+   
   }
   
 
@@ -63,8 +62,14 @@ class _MyAppState extends State<MyApp> {
                 if (snapshot.hasData) {
                   return Column(
                     children: [
-                      Converter(prices: jsonDecode(snapshot.data)),
-                      Store(coins : jsonDecode(snapshot.data).keys.toList()),
+                      Padding(
+                        padding: const EdgeInsets.all(30.0),
+                        child: Converter(prices: jsonDecode(snapshot.data)),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(30.0),
+                        child: Store(coins : jsonDecode(snapshot.data).keys.toList()),
+                      ),
                     ],
                   );
                 } else {

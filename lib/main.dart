@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
 
-import 'firebase.dart';
+import 'web/firebase.dart';
 
 
 void main() {
