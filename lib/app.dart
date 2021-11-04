@@ -1,3 +1,4 @@
+
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'screens/converter.dart';
@@ -36,9 +37,11 @@ class _MyAppState extends State<MyApp> {
   
 
   Future getData() async {
-    var data =
-        await http.get(Uri.parse("https://api.coingecko.com/api/v3/simple/price?ids=$query&vs_currencies=inr"));
-    return data.body;
+    
+      var data =
+          await http.get(Uri.parse("https://api.coingecko.com/api/v3/simple/price?ids=$query&vs_currencies=inr"));
+      return data.body;
+    
   }
 
   @override 
@@ -72,7 +75,12 @@ class _MyAppState extends State<MyApp> {
                       ),
                     ],
                   );
-                } else {
+                }
+                if(snapshot.hasError){
+                          
+                     return const Text('error');
+                }   
+                else {
                   return const CircularProgressIndicator();
                 }
               }),

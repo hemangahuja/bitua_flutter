@@ -25,9 +25,18 @@ class Store extends StatefulWidget {
 class _StoreState extends State<Store> {
 
 
-  final _store = FirebaseFirestore.instance.collection('user_coins');
+  late final Future dataLoaded = initStorage();
+
   late Map<String,int> storage = {};
   late String selected;
+
+
+  @override
+  void initState() {
+    super.initState();  
+    selected = widget.coins[1];
+
+  }
 
   void chooseCoin(int coinIndex){
       setState(() {
@@ -57,59 +66,62 @@ class _StoreState extends State<Store> {
       .catchError((error) => print(error));
 
   }
-  void getId() {
-      String docid = '';
-      FirebaseFirestore.instance
+  void getId() async {
+      
+      var allRows = await FirebaseFirestore.instance
         .collection('user_coins')
         .where('uuid',isEqualTo: FirebaseAuth.instance.currentUser!.uid)
         .where('coin_name',isEqualTo: selected)
-        .get()
-        .then((value) {
-          value.docs.forEach((element) {
-
-                save(element.id);
-            });
-        });
-      
-
+        .get();
+        
+        for(var row in allRows.docs){
+          save(row.id);
+        }
   }
   
-  void initStorage() async{
+  Future<String> initStorage() async{
+
+    
     final query = FirebaseFirestore.instance
     .collection('user_coins')
     .where('uuid',isEqualTo: FirebaseAuth.instance.currentUser!.uid);
     
-    final allRows = await query.get()
-    .then((value) {
-      value.docs.forEach((element) {
-        var data = element.data();
-        print(data);
-        setState(() {
-          storage[data["coin_name"]] = data["coin_amount"];
-        });
-      });
-    });
+    final allRows = await query.get();
+
+    for(var row in allRows.docs){
+
+      var data = row.data();
+      
+      storage[data["coin_name"]] = data["coin_amount"];
+     
+    }
+    return 'data loaded';
   }
 
-  @override
-  void initState() {
-    super.initState();
-    
-    WidgetsBinding.instance!.addPostFrameCallback((timeStamp) { initStorage(); });
+  
 
-    selected = widget.coins[1];
-  }
+
   @override
   
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        const Text('Store your coins here'),
-        Picker(coinSetter: chooseCoin, coinsNames: widget.coins),
-        Counter(updater: update),
-        Text('${storage[selected]} , $selected'),
-        ElevatedButton(onPressed: getId, child: const Text('Save')),
-      ]
+
+    return FutureBuilder(
+              future: dataLoaded,
+              builder: (context, AsyncSnapshot snapshot) {
+                if (snapshot.hasData) {
+                  return Column(
+                    children: [
+                      const Text('Store your coins here'),
+                      Picker(coinSetter: chooseCoin, coinsNames: widget.coins),
+                      Counter(updater: update),
+                      Text('${storage[selected]} , $selected'),
+                      ElevatedButton(onPressed: getId, child: const Text('Save')),
+                    ]
+                  );
+                } else {
+                  return const CircularProgressIndicator();
+                }
+              }
     );
   }
 }

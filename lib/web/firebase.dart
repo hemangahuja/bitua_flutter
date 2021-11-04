@@ -1,5 +1,6 @@
+
 import 'package:flutter/material.dart';
-import 'routes.dart';
+import '../helper/routes.dart';
 
 // Import the firebase_core plugin
 import 'package:firebase_core/firebase_core.dart';
@@ -33,7 +34,7 @@ class _AppState extends State<App> {
         // Check for errors
         if (snapshot.hasError) {
 
-          return const Text('Error');
+          return const Text('error');
           
         }
 

@@ -1,6 +1,7 @@
+
+import 'package:bitua/helper/validation.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
@@ -8,108 +9,118 @@ class LoginScreen extends StatefulWidget {
   @override
   _State createState() => _State();
 }
- 
-class _State extends State<LoginScreen> {
+class LoginData {
+  String email = '';
+  String password = '';
+}
+class _State extends State<LoginScreen> with InputValidationMixin {
 
-  TextEditingController nameController = TextEditingController();
-  TextEditingController passwordController = TextEditingController();
- 
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Bitua',
-      home: Scaffold(
-          appBar: AppBar(
-            title: const Text('Bitua'),
-          ),
-          body: Padding(
-              padding: const EdgeInsets.all(10),
-              child: ListView(
-                children: <Widget>[
-                  Container(
-                      alignment: Alignment.center,
-                      padding: const EdgeInsets.all(10),
-                      child: const Text(
-                        'Bitua',
-                        style: TextStyle(
-                            color: Colors.blue,
-                            fontWeight: FontWeight.w500,
-                            fontSize: 30),
-                      )),
-                  Container(
-                      alignment: Alignment.center,
-                      padding: const EdgeInsets.all(10),
-                      child: const Text(
-                        'Sign in',
-                        style: TextStyle(fontSize: 20),
-                      )),
-                  Container(
-                    padding: const EdgeInsets.all(10),
-                    child: TextField(
-                      controller: nameController,
-                      decoration: const InputDecoration(
-                        border: OutlineInputBorder(),
-                        labelText: 'User Name',
-                      ),
-                    ),
-                  ),
-                  Container(
-                    padding: const EdgeInsets.fromLTRB(10, 10, 10, 0),
-                    child: TextField(
-                      obscureText: true,
-                      controller: passwordController,
-                      decoration: const InputDecoration(
-                        border: OutlineInputBorder(),
-                        labelText: 'Password',
-                      ),
-                    ),
-                  ),
-                  TextButton(
-                    onPressed: (){
-                      //TODO forget password screen
-                    },
-                    
-                    child: const Text('Forgot Password', style: TextStyle(color: Colors.blue),),
-                  ),
-                  Container(
-                    height: 50,
-                      padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
-                      child: ElevatedButton(
-                        child: const Text('Login' , style: TextStyle(color: Colors.white),),
-                        onPressed: () async{
+  LoginData data = LoginData();
+  final formGlobalKey = GlobalKey<FormState>();
 
-                          try{
-                              await FirebaseAuth.instance.signInWithEmailAndPassword(email: nameController.text.toString().trim(), password: passwordController.text.toString().trim());
-                              Navigator.pushNamed(context, '/main');
-                          }
-                          on FirebaseAuthException catch (e){
-                            if(e.code == 'user-not-found'){
-                              print(e.code);
-                            }
-                            else if(e.code == 'wrong-password'){
-                              print(e.code);
-                            }
-                          }
+ 
+
+
+   @override
+   Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Bitua'),
+      ),
+      body:
+      Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 24),
+          child: Column(
+            children: [
+              Form(
+                key: formGlobalKey,
+                child: Column(
+                  children: [
+                const SizedBox(height: 50),
+                      TextFormField(
+                        onSaved: (value){
+                          data.email = value!;
                         },
-                      )),
-                  Row(
-                    children: <Widget>[
-                      const Text('Do not have account?'),
-                      TextButton(
-                        
-                        child: const Text(
-                          'Sign up',
-                          style: TextStyle(fontSize: 20 , color:  Colors.blue),
+                        decoration: const InputDecoration(
+                          labelText: "Email"
                         ),
-                        onPressed: () {
-                          Navigator.pushNamed(context, '/register');
+                        validator: (email) {
+                          if (isEmailValid(email!)) {
+                            return null;
+                          } else {
+                            return 'Enter a valid email address';
+                          }
                         },
-                      )
-                    ],
-                    mainAxisAlignment: MainAxisAlignment.center,
-                  )
-                ],
-              ))),
-    );
+                      ),
+                      const SizedBox(height: 24),
+                        TextFormField(
+                          onSaved: (value){
+                            data.password = value!;
+                          },
+                          decoration: const InputDecoration(
+                            labelText: "Password",
+                          ),
+                          maxLength: 32,
+                          obscureText: true,
+                          validator: (password) {
+                            if (isPasswordValid(password!)) {
+                              return null;
+                            } else {
+                              return 'Enter a valid password';
+                            }
+                          },
+                        ),
+                        const SizedBox(height: 50),
+                          ElevatedButton(
+                            onPressed: () async{
+                              if (formGlobalKey.currentState!.validate()) {
+                                formGlobalKey.currentState!.save();
+                                 try{
+
+                                    await FirebaseAuth.instance.signInWithEmailAndPassword(email: data.email.trim(), password: data.password.trim());
+                                    Navigator.pushNamed(context, '/main');
+                                }
+                                on FirebaseAuthException catch (e){
+                                  if(e.code == 'user-not-found'){
+                                    print(e.code);
+                                  }
+                                  else if(e.code == 'wrong-password'){
+                                    print(e.code);
+                                  }
+                                }
+                                catch(e){
+                                  print(e);
+                                }
+                                
+                              }
+                            },
+                            child: const Text("Submit"))
+              ],
+              
+                ),
+              ),
+               Row(
+                      children: <Widget>[
+                        const Text('Do not have account?'),
+                        TextButton(
+                          
+                          child: const Text(
+                            'Sign up',
+                            style: TextStyle(fontSize: 20 , color:  Colors.blue),
+                          ),
+                          onPressed: () {
+                            Navigator.pushNamed(context, '/register');
+                          },
+                        )
+                      ],
+                      mainAxisAlignment: MainAxisAlignment.center,
+                    )
+            ],
+          ),
+
+      ));
   }
 }
+
+
+  
