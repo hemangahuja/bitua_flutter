@@ -10,7 +10,7 @@ class Input extends StatefulWidget {
 }
 
 class _InputState extends State<Input> {
-  final myController = TextEditingController(text: '0');
+  final myController = TextEditingController(text: '0.0');
 
   @override
   void dispose() {
@@ -21,26 +21,24 @@ class _InputState extends State<Input> {
 
   @override
   Widget build(BuildContext context) {
-    return  Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-        children: [
+    return 
           SizedBox(
-            width: 30,
-            height: 30,
+            width: 75,
             child: TextFormField(
+              textAlign: TextAlign.center,
+              onChanged: (val) => pressed(val),
               controller: myController,
               keyboardType: TextInputType.number,
-              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-            ),
-          ),
-          ElevatedButton(
-              onPressed: pressed,
-              child: const Text('okay'))
-        ],
-      );
+              inputFormatters: [FilteringTextInputFormatter.allow(RegExp("[0-9.]"))],
+            ),  
+          );
+       
     
   }
-  void pressed(){
-    widget.setVal(int.parse(myController.text));
+  void pressed(val){
+    if(val == ''){
+      val = '0.0';
+    }
+    widget.setVal(double.parse(val));
   }
 }

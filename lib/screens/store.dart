@@ -6,6 +6,8 @@
 
 
 
+import 'package:bitua/screens/image.dart';
+
 import '../helper/picker.dart';
 import '../helper/counter.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -29,7 +31,8 @@ class _StoreState extends State<Store> {
 
   late Map<String,int> storage = {};
   late String selected;
-
+  bool isSaving = false;
+  bool isError = false;
 
   @override
   void initState() {
@@ -56,18 +59,20 @@ class _StoreState extends State<Store> {
   }
 
   void save(var docid){
-      print(docid);
+  
       FirebaseFirestore.instance
       .collection('user_coins')
       .doc(docid)
       .update(
         {'coin_amount': storage[selected]})
-      .then((value) => print('updated'))
-      .catchError((error) => print(error));
+      .then((val)=>{});
 
-  }
+  } 
   void getId() async {
       
+      setState(() {
+        isSaving = true;
+      });
       var allRows = await FirebaseFirestore.instance
         .collection('user_coins')
         .where('uuid',isEqualTo: FirebaseAuth.instance.currentUser!.uid)
@@ -77,6 +82,9 @@ class _StoreState extends State<Store> {
         for(var row in allRows.docs){
           save(row.id);
         }
+        setState(() {
+          isSaving = false;
+        });
   }
   
   Future<String> initStorage() async{
@@ -113,9 +121,11 @@ class _StoreState extends State<Store> {
                     children: [
                       const Text('Store your coins here'),
                       Picker(coinSetter: chooseCoin, coinsNames: widget.coins),
+                      SizedBox(height : 50 , width : 50 , child: ImageLoader(coin: selected,)),
                       Counter(updater: update),
-                      Text('${storage[selected]} , $selected'),
+                      Text('You have ${storage[selected]} coin(s) of ${selected[0].toUpperCase()}${selected.substring(1)} currency!'),
                       ElevatedButton(onPressed: getId, child: const Text('Save')),
+                      isSaving ? const CircularProgressIndicator() : const SizedBox(),
                     ]
                   );
                 } else {

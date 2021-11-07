@@ -22,6 +22,8 @@ class _State extends State<RegisterScreen> with InputValidationMixin {
   final formGlobalKey = GlobalKey<FormState>();
   final _auth = FirebaseAuth.instance;
   final _store = FirebaseFirestore.instance.collection('user_coins');
+  String _error = '';
+  bool isLoading = false;
 
   Future initSave(var uid) async {
     for (int i = 0; i < widget.coins.length; i++) {
@@ -33,6 +35,7 @@ class _State extends State<RegisterScreen> with InputValidationMixin {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+        resizeToAvoidBottomInset: false,
         appBar: AppBar(
           title: const Text('Bitua'),
         ),
@@ -77,9 +80,14 @@ class _State extends State<RegisterScreen> with InputValidationMixin {
                       },
                     ),
                     const SizedBox(height: 50),
+                    showAlert(_error),
                     ElevatedButton(
                         onPressed: () async {
+                         
                           if (formGlobalKey.currentState!.validate()) {
+                             setState(() {
+                            isLoading = true;
+                          });
                             formGlobalKey.currentState!.save();
                             try {
                               final cred =
@@ -87,19 +95,24 @@ class _State extends State<RegisterScreen> with InputValidationMixin {
                                       email: data.email.trim(),
                                       password: data.password.trim());
                               await initSave(cred.user!.uid);
+                              setState(() {
+                                isLoading = false;
+                              });
                               Navigator.pushNamed(context, '/');
                             } on FirebaseAuthException catch (e) {
-                              if (e.code == 'weak-password') {
-                                print(e.code);
-                              } else if (e.code == 'email-already-in-use') {
-                                print(e.code);
-                              }
-                            } catch (e) {
-                              print(e);
+                             
+                                setState(() {
+                                   if(e.message != null){
+                                      _error = e.message!;
+                                   }
+                                  isLoading = false;
+                                });
+                            
                             }
                           }
                         },
-                        child: const Text("Submit"))
+                        child: const Text("Submit")),
+                        showLoading(isLoading),
                   ],
                 ),
               ),

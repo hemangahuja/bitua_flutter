@@ -17,13 +17,14 @@ class _State extends State<LoginScreen> with InputValidationMixin {
 
   LoginData data = LoginData();
   final formGlobalKey = GlobalKey<FormState>();
-
+  String _error = '';
+  bool isLoading = false;
  
-
 
    @override
    Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       appBar: AppBar(
         title: const Text('Bitua'),
       ),
@@ -70,33 +71,38 @@ class _State extends State<LoginScreen> with InputValidationMixin {
                             }
                           },
                         ),
+                        const SizedBox(height: 10,),
+                        showAlert(_error),
                         const SizedBox(height: 50),
                           ElevatedButton(
                             onPressed: () async{
+                              
                               if (formGlobalKey.currentState!.validate()) {
+                                setState(() {
+                                isLoading = true;
+                              });
                                 formGlobalKey.currentState!.save();
                                  try{
-
                                     await FirebaseAuth.instance.signInWithEmailAndPassword(email: data.email.trim(), password: data.password.trim());
+                                    setState(() {
+                                      isLoading = false;
+                                    });
                                     Navigator.pushNamed(context, '/main');
-                                }
-                                on FirebaseAuthException catch (e){
-                                  if(e.code == 'user-not-found'){
-                                    print(e.code);
                                   }
-                                  else if(e.code == 'wrong-password'){
-                                    print(e.code);
+                                  on FirebaseAuthException catch (e){
+                                    setState(() {
+                                      if(e.message != null){
+                                          _error = e.message!;
+                                      isLoading = false;
+                                      }
+                                      
+                                    });
                                   }
-                                }
-                                catch(e){
-                                  print(e);
-                                }
-                                
-                              }
-                            },
-                            child: const Text("Submit"))
+                            }},
+                            child: const Text("Submit")),
+                            showLoading(isLoading),
               ],
-              
+                
                 ),
               ),
                Row(
