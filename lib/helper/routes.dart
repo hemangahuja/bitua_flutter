@@ -7,10 +7,12 @@ class RouteHandler extends StatelessWidget {
 
   RouteHandler({ Key? key }) : super(key: key);
 
-  final List coins = ["bitcoin" , "ethereum"];
+  final List<String> coins = ["bitcoin" , "ethereum" , "dogecoin" , "binance-coin"  , "tether", "cardano" , "8bit" , "antimatter" ,"halalchain" , "komodo"];
+  
 
   @override
   Widget build(BuildContext context) {
+    coins.sort();
     return MaterialApp(
       title: 'Bitua',
       initialRoute: '/',

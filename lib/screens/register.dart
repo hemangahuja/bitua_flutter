@@ -4,7 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:bitua/helper/validation.dart';
 
 class RegisterScreen extends StatefulWidget {
-  final List coins;
+  final List<String> coins;
   const RegisterScreen({Key? key, required this.coins}) : super(key: key);
 
   @override

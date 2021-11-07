@@ -21,7 +21,7 @@ class _ConverterState extends State<Converter> {
   
   Map<String,Image> images = {};
 
-  var f = NumberFormat("###,###.0#","en_US");
+  final f = NumberFormat("###,###.0#","en_US");
   late List coins;
   late String selectedCoin;
   late double multiplier;
@@ -54,28 +54,36 @@ class _ConverterState extends State<Converter> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
+    return Container(
+      padding: const EdgeInsets.all(10),
+      decoration: BoxDecoration(
         
-        const Text('Check price in INR'),
-        
-        Picker(coinsNames : coins , coinSetter : setSelectedCoin),
-        SizedBox(
-          height: 50,
-          width: 50,
-          child: ImageLoader(coin: selectedCoin,),
-        ),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Input(setVal: setMultiplier),
-            const SizedBox(width: 10,),
-            Flexible(child: Text('${f.format(widget.prices[selectedCoin]["inr"])} ₹ * $multiplier coin(s) = ${f.format(widget.prices[selectedCoin]["inr"] * multiplier)} ₹'))
-          ],
-        ),
-        
-    ],)
+        gradient: LinearGradient(colors: [Colors.yellow[600]! ,Colors.red[200]!]),
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          
+          const Text('Check price in INR!'),
+          
+          Picker(coinsNames : coins , coinSetter : setSelectedCoin),
+          SizedBox(
+            height: 50,
+            width: 50,
+            child: ImageLoader(coin: selectedCoin,),
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Input(setVal: setMultiplier),
+              const SizedBox(width: 10,),
+              Flexible(child: Text('${f.format(widget.prices[selectedCoin]["inr"])} ₹ * $multiplier ${selectedCoin[0].toUpperCase()}${selectedCoin.substring(1)} coin(s) = ${f.format(widget.prices[selectedCoin]["inr"] * multiplier)} ₹'))
+            ],
+          ),
+          
+      ],),
+    )
      ;
 
   }

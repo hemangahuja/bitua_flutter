@@ -8,7 +8,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 
 class MyApp extends StatefulWidget {
 
-  final List coins;
+  final List<String> coins;
   const MyApp({Key? key , required this.coins}) : super(key: key);
 
   @override
@@ -49,41 +49,61 @@ class _MyAppState extends State<MyApp> {
     return MaterialApp(
       title: 'Bitua',
       home: Scaffold(
+        
+        resizeToAvoidBottomInset: false,
         appBar: AppBar(
-          title: const Text('Bitua'),
+          title: Center(child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: const [
+              SizedBox(width: 50,),
+              Text('Bitua' , style: TextStyle(color: Colors.black ),),
+            ],
+          )),
+          flexibleSpace: Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [Colors.yellow[600]!, Colors.red[200]!]),
+              )
+            ),
           actions: [
             IconButton(onPressed: (){
               _auth.signOut();
               Navigator.popAndPushNamed(context, '/'); 
-            }, icon: const Icon(Icons.logout))
+            }, icon: const Icon(Icons.logout , color: Colors.black,))
           ],
         ),
-        body: Center(
-          child: FutureBuilder(
-              future: getData(),
-              builder: (context, AsyncSnapshot snapshot) {
-                if (snapshot.hasData) {
-                  return Column(
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.all(30.0),
-                        child: Converter(prices: jsonDecode(snapshot.data)),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.all(30.0),
-                        child: Store(coins : jsonDecode(snapshot.data).keys.toList()),
-                      ),
-                    ],
-                  );
-                }
-                if(snapshot.hasError){
-                          
-                     return const Text('error');
-                }   
-                else {
-                  return const CircularProgressIndicator();
-                }
-              }),
+        body: Container(
+          decoration:  BoxDecoration(
+           color: Colors.grey[850],
+          ),
+        
+          child: Center(
+            child: FutureBuilder(
+                future: getData(),
+                builder: (context, AsyncSnapshot snapshot) {
+                  if (snapshot.hasData) {
+                    return Column(
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.all(30.0),
+                          child: Converter(prices: jsonDecode(snapshot.data)),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.all(30.0),
+                          child: Store(coins : jsonDecode(snapshot.data).keys.toList()),
+                        ),
+                      ],
+                    );
+                  }
+                  if(snapshot.hasError){
+                            
+                       return const Text('error');
+                  }   
+                  else {
+                    return const CircularProgressIndicator();
+                  }
+                }),
+          ),
         ),
       ),
     );

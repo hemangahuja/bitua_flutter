@@ -20,6 +20,8 @@ class _PickerState extends State<Picker> {
   @override
   void initState(){
     super.initState();
+    
+    
     for(int i = 0;i < widget.coinsNames.length; i++){
       coinsWidgets.add(Text('${widget.coinsNames[i]}'));
     }
@@ -33,10 +35,9 @@ class _PickerState extends State<Picker> {
        height: 200,
        child: CupertinoPicker(
          
-         backgroundColor: Colors.grey,
+         backgroundColor: Colors.transparent,
          itemExtent: 30,
-         
-         scrollController: FixedExtentScrollController(initialItem: 1),
+        
          
          children: coinsWidgets,
          onSelectedItemChanged: (value){
