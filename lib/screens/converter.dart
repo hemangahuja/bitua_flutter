@@ -1,3 +1,5 @@
+import 'dart:collection';
+
 import 'package:bitua/helper/input.dart';
 import 'package:bitua/screens/image.dart';
 import 'package:flutter/cupertino.dart';
@@ -9,8 +11,9 @@ import 'package:intl/intl.dart';
 class Converter extends StatefulWidget {
 
   
-  final Map<String,dynamic> prices;
-  const Converter({ Key? key ,required this.prices}) : super(key: key);
+  final SplayTreeMap<String,dynamic> prices;
+  final Map<String,String> fiatSymbols;
+  const Converter({ Key? key ,required this.prices , required this.fiatSymbols}) : super(key: key);
 
   @override
   _ConverterState createState() => _ConverterState();
@@ -19,11 +22,12 @@ class Converter extends StatefulWidget {
 class _ConverterState extends State<Converter> {
 
   
-  Map<String,Image> images = {};
 
   final f = NumberFormat("###,###.0#","en_US");
   late List coins;
+  late List fiats;
   late String selectedCoin;
+  late String selectedFiat;
   late double multiplier;
   
   @override
@@ -31,7 +35,9 @@ class _ConverterState extends State<Converter> {
     super.initState();
     coins = widget.prices.keys.toList();
     selectedCoin = coins[0];
-    multiplier = 0.0;
+    fiats = widget.fiatSymbols.keys.toList();
+    selectedFiat = fiats[0];
+    multiplier = 0.0;   
   }
 
 
@@ -43,7 +49,11 @@ class _ConverterState extends State<Converter> {
       
     });
   }
-
+  void setSelectedFiat(int chosenFiat){
+    setState(() {
+      selectedFiat = fiats[chosenFiat];
+    });
+  }
   void setMultiplier(double val){
     setState(() {
       multiplier = val;
@@ -54,6 +64,8 @@ class _ConverterState extends State<Converter> {
 
   @override
   Widget build(BuildContext context) {
+
+
     return Container(
       padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(
@@ -62,12 +74,14 @@ class _ConverterState extends State<Converter> {
         borderRadius: BorderRadius.circular(10),
       ),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center, 
         children: [
           
-          const Text('Check price in INR!'),
+          Picker(coinsNames: fiats.map((e) => e.toUpperCase()).toList(), coinSetter: setSelectedFiat , identifier: "Fiat",),
+
+          Text('Check Price in ${selectedFiat.toUpperCase()}!'),
           
-          Picker(coinsNames : coins , coinSetter : setSelectedCoin),
+          Picker(coinsNames : coins , coinSetter : setSelectedCoin , identifier: "Coin",),
           SizedBox(
             height: 50,
             width: 50,
@@ -78,7 +92,11 @@ class _ConverterState extends State<Converter> {
             children: [
               Input(setVal: setMultiplier),
               const SizedBox(width: 10,),
-              Flexible(child: Text('${f.format(widget.prices[selectedCoin]["inr"])} ₹ * $multiplier ${selectedCoin[0].toUpperCase()}${selectedCoin.substring(1)} coin(s) = ${f.format(widget.prices[selectedCoin]["inr"] * multiplier)} ₹'))
+              Flexible(child: Text(
+              '$multiplier ${selectedCoin[0].toUpperCase()}${selectedCoin.substring(1)} coin(s) in ${selectedFiat.toUpperCase()} are ' 
+              '${multiplier * widget.prices[selectedCoin][selectedFiat]}'
+              '${widget.fiatSymbols[selectedFiat]}'
+              ))
             ],
           ),
           

@@ -1,3 +1,5 @@
+import 'dart:collection';
+
 import 'package:bitua/screens/image.dart';
 import '../helper/picker.dart';
 import '../helper/counter.dart';
@@ -16,7 +18,7 @@ class Store extends StatefulWidget {
 class _StoreState extends State<Store> {
   late final Future dataLoaded = initStorage();
 
-  late Map<String, int> storage = {};
+  late SplayTreeMap<String, int> storage = SplayTreeMap<String,int>();
   late String selected;
   bool isSaving = false;
   bool isError = false;
@@ -24,7 +26,7 @@ class _StoreState extends State<Store> {
   @override
   void initState() {
     super.initState();
-    selected = widget.coins[1];
+    selected = widget.coins[0];
   }
 
   void chooseCoin(int coinIndex) {
@@ -110,7 +112,7 @@ class _StoreState extends State<Store> {
               ),
               child: Column(children: [
                 const Text('Store your coins here!'),
-                Picker(coinSetter: chooseCoin, coinsNames: widget.coins),
+                Picker(coinSetter: chooseCoin, coinsNames: widget.coins , identifier: "Coin",),
                 SizedBox(
                     height: 50,
                     width: 50,

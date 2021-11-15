@@ -1,7 +1,11 @@
+
+import 'package:simple_gradient_text/simple_gradient_text.dart';
+import 'package:bitua/helper/gradient_style.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:bitua/helper/validation.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class RegisterScreen extends StatefulWidget {
   final List<String> coins;
@@ -36,102 +40,118 @@ class _State extends State<RegisterScreen> with InputValidationMixin {
   Widget build(BuildContext context) {
     return Scaffold(
         resizeToAvoidBottomInset: false,
-        appBar: AppBar(
-          title: const Text('Bitua'),
+        appBar:  AppBar(
+          title: Center(child: 
+           Text('Bitua' , style: GoogleFonts.lato(
+                textStyle: const TextStyle(color: Colors.black),
+              ),),),
+          flexibleSpace: Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [Colors.yellow[600]!, Colors.red[200]!]),
+              )
+            ),
         ),
-        body: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24),
-          child: Column(
-            children: [
-              Form(
-                key: formGlobalKey,
-                child: Column(
-                  children: [
-                    const SizedBox(height: 50),
-                    TextFormField(
-                      onSaved: (value) {
-                        data.email = value!;
-                      },
-                      decoration: const InputDecoration(labelText: "Email"),
-                      validator: (email) {
-                        if (isEmailValid(email!)) {
-                          return null;
-                        } else {
-                          return 'Enter a valid email address';
-                        }
-                      },
-                    ),
-                    const SizedBox(height: 24),
-                    TextFormField(
-                      onSaved: (value) {
-                        data.password = value!;
-                      },
-                      decoration: const InputDecoration(
-                        labelText: "Password",
-                      ),
-                      maxLength: 32,
-                      obscureText: true,
-                      validator: (password) {
-                        if (isPasswordValid(password!)) {
-                          return null;
-                        } else {
-                          return 'Enter a valid password';
-                        }
-                      },
-                    ),
-                    const SizedBox(height: 50),
-                    showAlert(_error),
-                    ElevatedButton(
-                        onPressed: () async {
-                         
-                          if (formGlobalKey.currentState!.validate()) {
-                             setState(() {
-                            isLoading = true;
-                          });
-                            formGlobalKey.currentState!.save();
-                            try {
-                              final cred =
-                                  await _auth.createUserWithEmailAndPassword(
-                                      email: data.email.trim(),
-                                      password: data.password.trim());
-                              await initSave(cred.user!.uid);
-                              setState(() {
-                                isLoading = false;
-                              });
-                              Navigator.pushNamed(context, '/');
-                            } on FirebaseAuthException catch (e) {
-                             
-                                setState(() {
-                                   if(e.message != null){
-                                      _error = e.message!;
-                                   }
-                                  isLoading = false;
-                                });
-                            
-                            }
+        body: Container(
+          color: Colors.grey[850],
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 24),
+            child: Column(
+              children: [
+                Form(
+                  key: formGlobalKey,
+                  child: Column(
+                    children: [
+                      const SizedBox(height: 50),
+                      TextFormField(
+                        style: gradientStyle,
+                        onSaved: (value) {
+                          data.email = value!;
+                        },
+                        decoration: const InputDecoration(labelText: "Email"),
+                        validator: (email) {
+                          if (isEmailValid(email!)) {
+                            return null;
+                          } else {
+                            return 'Enter a valid email address';
                           }
                         },
-                        child: const Text("Submit")),
-                        showLoading(isLoading),
-                  ],
+                      ),
+                      const SizedBox(height: 24),
+                      TextFormField(
+                        style: gradientStyle,
+                        onSaved: (value) {
+                          data.password = value!;
+                        },
+                        decoration: const InputDecoration(
+                          labelText: "Password",
+                        ),
+                        obscureText: true,
+                        validator: (password) {
+                          if (isPasswordValid(password!)) {
+                            return null;
+                          } else {
+                            return 'Enter a valid password';
+                          }
+                        },
+                      ),
+                      const SizedBox(height: 50),
+                      showAlert(_error),
+                      ElevatedButton(
+                          onPressed: () async {
+                           
+                            if (formGlobalKey.currentState!.validate()) {
+                               setState(() {
+                              isLoading = true;
+                            });
+                              formGlobalKey.currentState!.save();
+                              try {
+                                final cred =
+                                    await _auth.createUserWithEmailAndPassword(
+                                        email: data.email.trim(),
+                                        password: data.password.trim());
+                                await initSave(cred.user!.uid);
+                                setState(() {
+                                  isLoading = false;
+                                });
+                                Navigator.pushNamed(context, '/');
+                              } on FirebaseAuthException catch (e) {
+                               
+                                  setState(() {
+                                     if(e.message != null){
+                                        _error = e.message!;
+                                     }
+                                    isLoading = false;
+                                  });
+                              
+                              }
+                            }
+                          },
+                          child: const Text("Submit")),
+                          showLoading(isLoading),
+                    ],
+                  ),
                 ),
-              ),
-              Row(
-                children: <Widget>[
-                  const Text('Already have an account?'),
-                  TextButton(
-                    child: const Text(
-                      'Sign in',
-                      style: TextStyle(fontSize: 20, color: Colors.blue),
-                    ),
-                    onPressed: () {
-                      Navigator.pushNamed(context, '/');
-                    },
-                  )
-                ],
-                mainAxisAlignment: MainAxisAlignment.center,
-              )
-            ],
+                Row(
+                  children: <Widget>[
+                    GradientText('Already have an account?' , 
+                    colors: [
+                       Colors.yellow[600]!, Colors.red[200]!
+                    ],),
+                    TextButton(
+                      child: const Text(
+                        'Sign in',
+                        style: TextStyle(fontSize: 20, color: Colors.blue),
+                      ),
+                      onPressed: () {
+                        Navigator.popAndPushNamed(context, '/');
+                      },
+                    )
+                  ],
+                  mainAxisAlignment: MainAxisAlignment.center,
+                )
+              ],
+            ),
           ),
         ));
   }
